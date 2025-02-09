@@ -1,0 +1,1 @@
+ /Users/qasim/Documents/AI-Agents_VertexAi_Flutter/.dart_tool/flutter_build/9105af5102266a4835941389e98fe8de/native_assets.yaml: 
