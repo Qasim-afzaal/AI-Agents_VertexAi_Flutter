@@ -61,7 +61,7 @@ This project is inspired by the [Photo Discovery Sample App](https://github.com/
 
 2. Navigate to the project directory:
    ```bash
-   cd your-repo-name
+   cd ai-agent_vertexai
    ```
 
 3. Install dependencies:
@@ -92,7 +92,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 Built with ❤️ using Flutter and Firebase.
 ```
 
-### Notes:
-1. Replace `your-username` and `your-repo-name` with your actual GitHub username and repository name.
-2. Ensure you have a `LICENSE` file in your repository if you choose to use the MIT License.
-3. Add more sections (e.g., screenshots, detailed setup instructions) as needed to make the README more comprehensive.
