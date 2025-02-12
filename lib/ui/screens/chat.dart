@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert' as convert;
-
-
 import 'package:ai_agents_vertex_ai/config.dart';
 import 'package:ai_agents_vertex_ai/functionality/app_state.dart';
 import 'package:ai_agents_vertex_ai/ui/components/app_components.dart';
@@ -37,8 +35,7 @@ class _ChatPageState extends State<ChatPage> {
     _messages.add(types.TextMessage(
       id: const Uuid().v4(),
       author: _agent,
-      text:
-          'Hey there! My name is Khanh. I\'m your assistant, let me know how I can help.',
+      text: 'Hey there! My name is Khanh. I\'m your assistant, let me know how I can help.',
     ));
   }
 
@@ -56,24 +53,17 @@ class _ChatPageState extends State<ChatPage> {
     );
 
     _addMessage(textMessage);
-
     _sendMessageToAgent(message);
   }
 
-  Future<String> askAgent(
-      String name, String description, String question) async {
+  Future<String> askAgent(String name, String description, String question) async {
     var query = 'The photo is $name. $description. $question.';
-
     var endpoint = Uri.https(cloudRunHost, '/ask_gemini', {'query': query});
     var response = await http.get(endpoint);
-
     if (response.statusCode == 200) {
-      var responseText = convert.utf8.decode(response.bodyBytes);
-
-      return responseText.replaceAll(RegExp(r'\*'), '');
+      return convert.utf8.decode(response.bodyBytes).replaceAll(RegExp(r'\*'), '');
     }
-
-    return 'Sorry I can\'t answer that.';
+    return 'Sorry, I can\'t answer that.';
   }
 
   void _sendMessageToAgent(types.PartialText message) async {
@@ -100,84 +90,48 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void _pickSuggestedQuestion(String question) {
-    var message = types.PartialText(text: question);
-
-    _handleSendPressed(message);
-  }
-
   @override
   Widget build(BuildContext context) {
     var metadata = context.watch<AppState>().metadata;
+    List<types.User> typingUsers = loading ? [_agent] : [];
 
-    Widget? suggestionsWidget;
-
-    if (metadata != null) {
-      if (_messages.length == 1) {
-        suggestionsWidget = Padding(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-          child: TagCapsule(
-            onTap: _pickSuggestedQuestion,
-            title: 'Suggested Questions',
-            tags: metadata.suggestedQuestions,
-          ),
-        );
-      }
-    }
-
-    List<types.User> typingUsers = [];
-
-    if (loading) typingUsers.add(_agent);
-
-    return Column(
-      children: [
-        AppBar(
-          title: const Text('Chat with AI'),
-          actions: (widget.onExit != null)
-              ? [
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: IconButton(
-                      color: Theme.of(context).colorScheme.secondary,
-                      onPressed: widget.onExit,
-                      icon: const Icon(
-                        size: 28,
-                        FontAwesomeIcons.circleXmark,
-                      ),
-                    ),
-                  )
-                ]
-              : [],
-        ),
-        Expanded(
-          child: Chat(
-            typingIndicatorOptions: TypingIndicatorOptions(
-              typingUsers: typingUsers,
-            ),
-            listBottomWidget: suggestionsWidget,
-            messages: _messages,
-            onSendPressed: _handleSendPressed,
-            showUserAvatars: true,
-            showUserNames: true,
-            user: _user,
-            theme: DefaultChatTheme(
-              receivedMessageBodyTextStyle: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('AI Chat Assistant'),
+        actions: widget.onExit != null
+            ? [
+                IconButton(
+                  onPressed: widget.onExit,
+                  icon: const Icon(FontAwesomeIcons.circleXmark, size: 28),
+                ),
+              ]
+            : null,
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Chat(
+              typingIndicatorOptions: TypingIndicatorOptions(
+                typingUsers: typingUsers,
               ),
-              sentMessageBodyTextStyle: TextStyle(
-                color: Theme.of(context).colorScheme.onSecondary,
+              messages: _messages,
+              onSendPressed: _handleSendPressed,
+              showUserAvatars: true,
+              showUserNames: true,
+              user: _user,
+              theme: DefaultChatTheme(
+                backgroundColor: Colors.black,
+                primaryColor: Colors.blueAccent,
+                secondaryColor: Colors.grey.shade900,
+                receivedMessageBodyTextStyle: TextStyle(color: Colors.white),
+                sentMessageBodyTextStyle: TextStyle(color: Colors.white),
+                userAvatarNameColors: [Colors.blueAccent],
+                messageBorderRadius: 16,
               ),
-              userAvatarNameColors: [
-                Theme.of(context).colorScheme.primary,
-              ],
-              backgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainerHigh,
-              primaryColor: Theme.of(context).colorScheme.primary,
-              secondaryColor: Theme.of(context).colorScheme.surface,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
